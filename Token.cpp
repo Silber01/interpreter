@@ -13,11 +13,11 @@ Token::Token(TokenType t, string val, int line)
     value = std::move(val);
     this->line = line;
 }
-Token::Token(Token *t)
+Token::Token(Token *t, int i)
 {
     type = t->getTokenType();
     value = *(t->getVal());
-    this->line = -1;
+    line = -1;
 }
 
 string Token::toString()

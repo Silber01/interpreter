@@ -38,7 +38,24 @@ Token* getVar(string *name,
 }
 
 
-
+Token* makeToken(TokenType type, string val)
+{
+    cout << "TOKEN CREATED\n";
+    return new Token(type, val, -1);
+}
+Token* makeToken(Token* token)
+{
+    cout << "TOKEN COPIED\n";
+    return new Token(token);
+}
+void freeToken(Token* token)
+{
+    if (token->getLine() == -1)
+    {
+        cout << "Deleting " << token << ": " << token->toString();
+        delete(token);
+    }
+}
 Token* solveArithmetic(Token* arg1, Token* op, Token* arg2)
 {
     int val1;
@@ -49,7 +66,7 @@ Token* solveArithmetic(Token* arg1, Token* op, Token* arg2)
     catch (...)
     {
         cerr << "INVALID ARGUMENT: " << arg1->toString();
-        return new Token(INVALID, "", -1);
+        return makeToken(INVALID, "");
     }
     try {
         val2 = stoi(*(arg2->getVal()));
@@ -57,49 +74,43 @@ Token* solveArithmetic(Token* arg1, Token* op, Token* arg2)
     catch (...)
     {
         cerr << "INVALID ARGUMENT: " << arg2->toString();
-        return new Token(INVALID, "", -1);
+        return makeToken(INVALID, "");
     }
     switch(op->getTokenType())
     {
         case PLUS:
-            return new Token(INT, to_string(val1 + val2), -1);
+            return makeToken(INT, to_string(val1 + val2));
         case MINUS:
-            return new Token(INT, to_string(val1 - val2), -1);
+            return makeToken(INT, to_string(val1 - val2));
         case TIMES:
-            return new Token(INT, to_string(val1 * val2), -1);
+            return makeToken(INT, to_string(val1 * val2));
         case DIVIDE:
-            return new Token(INT, to_string(val1 / val2), -1);
+            return makeToken(INT, to_string(val1 / val2));
         case MOD:
-            return new Token(INT, to_string(val1 % val2), -1);
+            return makeToken(INT, to_string(val1 % val2));
         case MORETHAN:
-            return new Token(INT, to_string(val1 > val2), -1);
+            return makeToken(INT, to_string(val1 > val2));
         case LESSTHAN:
-            return new Token(INT, to_string(val1 < val2), -1);
+            return makeToken(INT, to_string(val1 < val2));
         case MOREEQUALS:
-            return new Token(INT, to_string(val1 >= val2), -1);
+            return makeToken(INT, to_string(val1 >= val2));
         case LESSEQUALS:
-            return new Token(INT, to_string(val1 <= val2), -1);
+            return makeToken(INT, to_string(val1 <= val2));
         case EQUALEQUAL:
-            return new Token(INT, to_string(val1 == val2), -1);
+            return makeToken(INT, to_string(val1 == val2));
         case NOTEQUAL:
-            return new Token(INT, to_string(val1 != val2), -1);
+            return makeToken(INT, to_string(val1 != val2));
         case AND:
-            return new Token(INT, to_string(val1 && val2), -1);
+            return makeToken(INT, to_string(val1 && val2));
         case OR:
-            return new Token(INT, to_string(val1 || val2), -1);
+            return makeToken(INT, to_string(val1 || val2));
         default:
             cerr << "INVALID OPERATOR\n";
             return new Token(INVALID, "", -1);
     }
 }
-void freeToken(Token* token)
-{
-    if (token->getLine() == -1)
-    {
-        //cout << "Deleting " << token->toString();
-        delete(token);
-    }
-}
+
+
 
 void replaceExpr(vector<Token*>* expression, int start)
 {
@@ -110,18 +121,18 @@ void replaceExpr(vector<Token*>* expression, int start)
     expression->erase(expression->begin() + start);
     expression->erase(expression->begin() + start);
     Token* ans = solveArithmetic(arg1, op, arg2);
+    cout << "\tREPLACEEXPR Creating " << ans << ": " << ans->toString();
     expression->insert(expression->begin() + start, ans);
     freeToken(arg1);
     freeToken(arg2);
     freeToken(op);
 }
-
 Token* solveExpression(vector<Token*>* expression, unordered_map<string, TokenType>* typeLookup, unordered_map<string, string>* varLookup)
 {
     if (expression->empty())
     {
         cerr << "EMPTY EXPRESSION\n";
-        return new Token(INVALID, "", -1);
+        return makeToken(INVALID, "");
     }
     // ----------------- Step 1: Get expressions without parenthesis -----------------
     int tIter = 0;
@@ -141,7 +152,7 @@ Token* solveExpression(vector<Token*>* expression, unordered_map<string, TokenTy
                 if (tIter == expression->size())
                 {
                     cerr << "MISSING END PARENTHESIS\n";
-                    return new Token(INVALID, "", -1);
+                    return makeToken(INVALID, "");
                 }
                 thisToken = (*expression)[tIter];
                 if (thisToken->getTokenType() == LPAREN)
@@ -198,7 +209,7 @@ Token* solveExpression(vector<Token*>* expression, unordered_map<string, TokenTy
                 if (thisToken->getTokenType() != STR and thisToken->getTokenType() != INT)
                 {
                     cerr << "INVALID STRING EXPRESSION: STRING NOT FOUND WHEN EXPECTED";
-                    return new Token(INVALID, "", -1);
+                    return makeToken(INVALID, "");
                 }
                 result += *(thisToken->getVal());
                 if (thisToken->getLine() == -1)
@@ -209,12 +220,12 @@ Token* solveExpression(vector<Token*>* expression, unordered_map<string, TokenTy
                 if (thisToken->getTokenType() != PLUS)
                 {
                     cerr << "INVALID STRING EXPRESSION: PLUS NOT FOUND WHEN EXPECTED";
-                    return new Token(INVALID, "", -1);
+                    return makeToken(INVALID, "");
                 }
             }
             tIter++;
         }
-        return new Token(STR, result, -1);
+        return makeToken(STR, result);
     }
     //----------------- Step 4: Check for standalone minuses -----------------
 
@@ -232,22 +243,21 @@ Token* solveExpression(vector<Token*>* expression, unordered_map<string, TokenTy
             }
             if (expression->size() == tIter + 1) {
                 cerr << "MINUS AT END OF STATEMENT\n";
-                return new Token(INVALID, "", -1);
+                return makeToken(INVALID, "");
             }
             if ((*expression)[tIter + 1]->getTokenType() != INT) {
                 cerr << "MINUS TO NONINTEGER\n";
-                return new Token(INVALID, "", -1);
+                return makeToken(INVALID, "");
             }
             Token *negateMe = (*expression)[tIter + 1];
             int newVal = stoi(*(negateMe->getVal())) * -1;
-            auto *negated = new Token(INT, to_string(newVal), -1);
+            auto *negated = makeToken(INT, to_string(newVal));
             freeToken(negateMe);
             noMinuses.push_back(negated);
             tIter++;
         }
         else
         {
-
             noMinuses.push_back((*expression)[tIter]);
         }
         tIter++;
@@ -262,15 +272,15 @@ Token* solveExpression(vector<Token*>* expression, unordered_map<string, TokenTy
         if ((*expression)[tIter]->getTokenType() == NOT) {
             if (expression->size() == tIter + 1) {
                 cerr << "NOT AT END OF STATEMENT\n";
-                return new Token(INVALID, "", -1);
+                return makeToken(INVALID, "");
             }
             if ((*expression)[tIter + 1]->getTokenType() != INT) {
                 cerr << "NOT TO NONINTEGER\n";
-                return new Token(INVALID, "", -1);
+                return makeToken(INVALID, "");
             }
             Token *notMe = (*expression)[tIter + 1];
             int newVal = !stoi(*(notMe->getVal()));
-            auto *notted = new Token(INT, to_string(newVal), -1);
+            auto *notted = makeToken(INT, to_string(newVal));
             freeToken(notMe);
             noNots.push_back(notted);
             tIter++;
@@ -290,7 +300,7 @@ Token* solveExpression(vector<Token*>* expression, unordered_map<string, TokenTy
         cerr << "INVALID EXPRESSION COUNT\n";
         for (auto &i: *expression)
             cerr << i->toString();
-        return new Token(INVALID, "", -1);
+        return makeToken(INVALID, "");
     }
     unordered_set<TokenType> ops({TIMES, DIVIDE, MOD, PLUS, MINUS, LESSEQUALS, LESSTHAN, MOREEQUALS, MORETHAN, EQUALEQUAL, NOTEQUAL, AND, OR});
     //----------------- Step 5: Check if even indices are values and odd indeces are operators -----------------
@@ -302,7 +312,7 @@ Token* solveExpression(vector<Token*>* expression, unordered_map<string, TokenTy
             if (thisToken->getTokenType() != INT and thisToken->getTokenType() != STR)
             {
                 cerr << "VALUE NOT FOUND WHEN EXPECTED\n";
-                return new Token(INVALID, "", -1);
+                return makeToken(INVALID, "");
             }
         }
         else
@@ -310,7 +320,7 @@ Token* solveExpression(vector<Token*>* expression, unordered_map<string, TokenTy
             if (ops.find(thisToken->getTokenType()) == ops.end())
             {
                 cerr << "OPERATOR NOT FOUND WHEN EXPECTED: " << thisToken->toString();
-                return new Token(INVALID, "", -1);
+                return makeToken(INVALID, "");
             }
         }
         tIter++;
@@ -338,12 +348,16 @@ Token* solveExpression(vector<Token*>* expression, unordered_map<string, TokenTy
                     noExpr = false;
                     //cout << "REPLACEMENT OCCURED, NOW POINTING TO " << (*expression)[tIter]->toString();;
                 }
-                reduced->push_back(new Token((*expression)[tIter]));
+                auto* remake = makeToken((*expression)[tIter]);
+                reduced->push_back(remake);
+                //cout << "\tREPLACING EXPR Creating " << remake << ": " << remake->toString();
                 tIter++;
             }
             while (tIter < (signed int)(expression->size()))
             {
-                reduced->push_back(new Token((*expression)[tIter]));
+                auto* remake = makeToken((*expression)[tIter]);
+                reduced->push_back(remake);
+                //cout << "\tPUTTING LAST IN Creating " << remake << ": " << remake->toString();
                 tIter++;
             }
             for (auto &i : *expression)
@@ -361,9 +375,10 @@ Token* solveExpression(vector<Token*>* expression, unordered_map<string, TokenTy
 //    {
 //        freeToken((*expression)[i]);
 //    }
-    Token *result = (*expression)[0];
-    //cout << "RETURNING " << result->toString();
-    return new Token(result->getTokenType(), *result->getVal(), -1);
+    Token *result = makeToken((*expression)[0]);
+    delete((*expression)[0]);
+    //cout << "RETURNING " << result << ": " << result->toString();
+    return result;
 
     //make new vector (all vectors will be of type Token*)
     //pass 1: if token not lparen, put in vector. Else, solve recursively, put result in vector, and skip tokens that were parsed
@@ -402,11 +417,11 @@ int executePrint(vector<Token>* tokens, int tIter, unordered_map<string, TokenTy
     Token* result = solveExpression(&expression, typeLookup, varLookup);
     if (result->getTokenType() == INVALID)
     {
-        delete(result);
+        freeToken(result);
         return -1;
     }
     cout << *(*result).getVal() << "\n";
-    delete(result);
+    freeToken(result);
     return tIter;
 }
 
@@ -444,11 +459,11 @@ int executeVarInit(TokenType type, vector<Token>* tokens, int tIter, unordered_m
         if (val->getTokenType() != type)
         {
             cerr << "INVALID VARIABLE TYPE\n";
-            delete(val);
+            freeToken(val);
             return -1;
         }
         (*varLookup)[varName] = *(val->getVal());
-        delete(val);
+        freeToken(val);
 
     }
     else return -1;
@@ -487,11 +502,11 @@ int executeRedeclaration(vector<Token>* tokens, int tIter, unordered_map<string,
     if (val->getTokenType() != (*typeLookup)[name])
     {
         cerr << "VARIABLE REASSIGNMENT TO WRONG TYPE\n";
-        delete(val);
+        freeToken(val);
         return -1;
     }
     (*varLookup)[name] = *(val->getVal());
-    delete(val);
+    freeToken(val);
     return tIter;
 }
 int executeIf(vector<Token>* tokens, int tIter, unordered_map<string, TokenType>* typeLookup, unordered_map<string, string>* varLookup, bool *lastCondition)
@@ -517,11 +532,12 @@ int executeIf(vector<Token>* tokens, int tIter, unordered_map<string, TokenType>
         tIter++;
     }
     Token *result = solveExpression(&expression, typeLookup, varLookup);
+
     if (result->getTokenType() == STR)
         *lastCondition = true;
     else
         *lastCondition = stoi(*(result->getVal()));
-    delete(result);
+    freeToken(result);
     return tIter;
 }
 int executeInput(vector<Token>* tokens, int tIter, unordered_map<string, TokenType>* typeLookup, unordered_map<string, string>* varLookup)
@@ -661,8 +677,9 @@ int Block::execute()
             // --------------- var redeclaration ---------------
         else if (thisToken.getTokenType() == NAME)
         {
-            //cout << "var redeclaration statement at " << thisToken.toString();
+            cout << "var redeclaration statement at " << thisToken.toString();
             tIter = executeRedeclaration(tokens, tIter, typeLookup, varLookup);
+            cout << "VAR REDECLARATION OVER\n";
         }
             // --------------- input ---------------
         else if (thisToken.getTokenType() == INPUT)
@@ -678,10 +695,11 @@ int Block::execute()
         }
         else if (thisToken.getTokenType() == WHILE)
         {
-            //cout << "while statement at " << thisToken.toString();
+            cout << "while statement at " << thisToken.toString();
             loopIndex = tIter;
             //cout << "loopIndex goes to " << (*tokens)[loopIndex].toString();
             tIter = executeIf(tokens, tIter, typeLookup, varLookup, &lastCondition);
+            cout << "WHILE OVER\n";
         }
         else if (thisToken.getTokenType() == ELSE)
         {

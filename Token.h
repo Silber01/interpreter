@@ -10,7 +10,7 @@
 class Token {
 public:
     Token(TokenType t, std::string val, int line);
-    explicit Token(Token *t);
+    Token(Token *t, int i = 0);
     std::string toString();
     TokenType getTokenType();
     std::string* getVal();

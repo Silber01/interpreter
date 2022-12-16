@@ -1,15 +1,5 @@
-int fib1 = 0;
-int fib2 = 1;
-int nextFib = 0;
 int i = 0;
-int numbersToMake = 20;
-print(fib1);
-print(fib2);
-while (i < numbersToMake - 2)
+while (1)
 {
-    nextFib = fib1 + fib2;
-    print(nextFib);
-    fib1 = fib2;
-    fib2 = nextFib;
-    i = i + 1;
+    i = 5 + 3;
 }
