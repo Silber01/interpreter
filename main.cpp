@@ -34,7 +34,7 @@ void fillInstMap(map<string, TokenType>* instMap)
 }
 int getNextToken(vector<Token>* tokens, string* fileText, string::iterator start, map<string, TokenType>* instMap, int line)
 {
-    cout << *fileText << endl;
+    //cout << *fileText << endl;
     switch (*start) {
         case ' ':
         case '\t':
@@ -176,7 +176,19 @@ void getTokens(string* lineText, vector<Token>* tokens, int line, map<string, To
         }
     }
 }
+void printLogo()
+{
+    cout << "      ::::::::   :::::::: ::::::::::: :::  " << endl;
+    cout << "    :+:    :+: :+:    :+:    :+:     :+:   " << endl;
+    cout << "   +:+        +:+           +:+     +:+    " << endl;
+    cout << "  +#+        +#++:++#++    +#+     +#+     " << endl;
+    cout << " +#+               +#+    +#+     +#+      " << endl;
+    cout << "#+#    #+# #+#    #+#    #+#     #+#       " << endl;
+    cout << "########   ######## ########### ########## " << endl;
+    cout << "CSIL Interpreter by Daniel Slade\n";
+}
 int main() {
+    printLogo();
     map<string, TokenType> instMap;
     fillInstMap(&instMap);
     fstream programFile;
@@ -206,12 +218,12 @@ int main() {
     }
     else return -1;
 
-    cout << "TOKENIZED CODE:\n";
-    for (auto & token : *tokens)
-    {
-        cout << token.toString();
-    }
-    cout << "\n\nEXECUTED CODE:\n";
+//    cout << "TOKENIZED CODE:\n";
+//    for (auto & token : *tokens)
+//    {
+//        cout << token.toString();
+//    }
+    cout << "\nEXECUTED CODE:\n";
     unordered_map<string, TokenType> typeLookup;
     unordered_map<string, string> varLookup;
     Block testBlock(tokens, 0, &typeLookup, &varLookup);

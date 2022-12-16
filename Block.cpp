@@ -357,13 +357,11 @@ Token* solveExpression(vector<Token*>* expression, unordered_map<string, TokenTy
         }
 
     }
-//    for (int i = 1; i < expression->size(); ++i)
-//    {
-//        freeToken((*expression)[i]);
-//    }
-    Token *result = (*expression)[0];
+
+    auto result = new Token((*expression)[0]);
+    delete((*expression)[0]);
     //cout << "RETURNING " << result->toString();
-    return new Token(result->getTokenType(), *result->getVal(), -1);
+    return result;
 
     //make new vector (all vectors will be of type Token*)
     //pass 1: if token not lparen, put in vector. Else, solve recursively, put result in vector, and skip tokens that were parsed

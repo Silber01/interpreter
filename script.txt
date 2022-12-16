@@ -2,13 +2,23 @@ int fib1 = 0;
 int fib2 = 1;
 int nextFib = 0;
 int i = 0;
-int numbersToMake = 20;
-print(fib1);
-print(fib2);
+int numbersToMake = 40;
+string space = "";
+print("The first " + numbersToMake + " numbers of the fibonacci sequence are as follows:");
+print("#1:  " + fib1);
+print("#2:  " + fib2);
 while (i < numbersToMake - 2)
 {
+    if ((i + 3) < 10)
+    {
+        space = " ";
+    }
+    else
+    {
+        space = "";
+    }
     nextFib = fib1 + fib2;
-    print(nextFib);
+    print("#" + (i + 3) + ": " + space + nextFib);
     fib1 = fib2;
     fib2 = nextFib;
     i = i + 1;
