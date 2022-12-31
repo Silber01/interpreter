@@ -5,7 +5,7 @@ Interpreter for a basic C-like language called CSIL (created for the purpose of 
 `int <varName>;` \
 `int <varName>; = <expression>;` \
 `string <varName>;` \
-`string <varName&gt; = <expression>;` \
+`string <varName>; = <expression>;` \
 `print(<expression>);` \
 `input(<variable>);` \
 `if(<expression>)` \
