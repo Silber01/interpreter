@@ -3,7 +3,7 @@ Interpreter for a basic C-like language called CSIL (created for the purpose of 
 ## Instructions
 `print(<expression>);` \
 `int <varName>;` \
-`int <varName&gt; = <expression>;` \
+`int <varName>; = <expression>;` \
 `string <varName>;` \
 `string <varName&gt; = <expression>;` \
 `print(<expression>);` \
